@@ -1,0 +1,55 @@
+Task: 
+- Set up a VPC with around 15,000 private IP address
+- VPC IPv4 CIDR block to be a 192.x.x.x 
+- Allocate at least 50 IP addresses for public subnet
+- Must be able to ping google.com
+
+1. Launch VPC Wizard to build the VPC.
+2. Click the VPC only to create only the VPC resource and give it a 
+name, in this case we will call it LabVPC. Modify the network resources 
+later.
+3. IPv4 CIDR block should be 192.168.0.0/18. Use /18 because it is 
+specified that it should be around 15,000 private IP addressess. /18 has
+about 16,382 number of usable hosts, closeset to 15,000.
+4. Choose No IPv6 CIRD block and Create VPC.
+5. On them menu located on the left side, Choose Subnet and 
+create a subnet.
+6. VPC should be the LabVPC and has a subnet name Public Subnet. 
+Public Subnet's IPv4 CIDR should be 192.168.1.0/26. /26 has 62 IP 
+addresses available. Leave all the rest to default settings.
+7. On them menu located on the left side, click Route Tables and then 
+click Create Route Tables.
+8. Name it Public route table and the VPC used should be the LabVPC.
+9. On them menu located on the left side, choose Internet gateways and 
+create internet gateway. Name it Public IGW.
+10. After creating an internet gateway, attach the gateway to the 
+Public VPC.
+11. Navigate back to the Route table, choose the Public route table and 
+click Edit Routes. Add the route with 0.0.0.0/0 as its destination and 
+target is the internet gateway (Public IGW).
+12. Still in the Route table, choose the Public route table and click 
+Edit Subnet Associations. Click the checkbox for the Public Subnet to 
+save it as an association for this route table.
+13. Check if the Network ACL's inbound rules has rule number 100 and 
+allows all traffic from source 0.0.0.0/0.
+14. On them menu located on the left side, choose Security groups and 
+create security group named Public security group that allows public 
+access. The VPC should be the LabVPC. 
+15. Configure the inbound rules for the Security group so that it allows 
+the connection for SSH, HTTP, HTTPS from all sources (0.0.0.0/0) and 
+then create the security group.
+16. Go to EC2 instance and provision an instance named test instance. 
+Choose Amazon Linux 2 AMI; instance type must be t2.micro; the key-pair 
+must be the vockey provided in the laboratory. The network settings of 
+the instance must have the testVPC as its VPC, Public subnet as its 
+subnet, public security group as its Security Group and then launch
+instance.
+17. Wait for the instance to be provisioned. After that, copy the public 
+IPv4 address of the test instance as it will be used for testing if it 
+is successfully provisioned.
+18. Using PuTTY, create a session with host name or IP address as the 
+public IPv4 address of the test instance created. Download the key-pair 
+for the laboratory and then insert it in this session. Login as an 
+ec2-user and run ping google.com command to test internet connectivity.
+It should be able to display the packet connections after running the 
+ping command.

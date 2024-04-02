@@ -1,0 +1,25 @@
+# Step 1: Create DB Subnet Group
+1.1 Go to Management Console and search for Amazon RDS.
+1.2 On the left side of the menu, click "Subnet groups" and then
+choose "Create DB subnet group".
+1.3 In creating the DB subnet group, modify the following:
+   -- Name: DBSubnetGroup
+   -- Description: subnet group for database
+   -- VPC: lab-VPC (choose the VPC created earlier)
+   -- Availability Zones: us-west-2a, us-west-2b (choose any of the AZ's you used for your subnets)
+   -- Subnets: choose subnet 3 and 4
+
+# Step 2: Create Database
+2.1 Go to "Databases" and select "Create database".
+2.2 Click "Standard create", choose "MariaDB" for the engine type. 
+Choose "Free tier" as the template and give it an identifier.
+The master username is "root" for this lab but leaving it on 
+default is also optional. Create a password and in this lab, 
+"Re:Start!9" is the password. Leave the instance configuration
+to default and the storage. "Don't connect to an EC2 compute 
+resource" and choose "IPv4" for network type. Choose the VPC 
+created earlier and the "dbsubnetgroup", "Don't allow" public 
+access and choose an "DatabaseSG" as its Security Group. In the 
+Additional configuration, name it as "mydb" in the initial 
+database name and disable the backup, encryption, and maintenance.
+ 

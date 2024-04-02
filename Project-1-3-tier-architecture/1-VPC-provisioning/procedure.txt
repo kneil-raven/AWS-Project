@@ -1,0 +1,147 @@
+# Step 1: Create VPC
+1.1 Go to management console, search for VPC and click create VPC.
+1.2 Click the VPC only to create the VPC resource and give it a 
+name, in this case, I created lab-VPC.
+1.3 IPv4 CIDR block should be 192.168.0.0/18, /18 because it is 
+has 16,384 IP addressess, closest to 15,000 required address.
+```
+NOTE: https://matt-rickard.com/how-to-calculate-a-cidr
+refer to this website for CIDR notation
+```
+1.4 It should have No IPv6 CIDR block and leave all options to 
+default and click Create VPC.
+
+
+# Step 2: Create Subnet
+2.1 On the menu located on the left side, Choose Subnet and 
+create a subnet.
+## Create Public Subnet 
+2.2.1 Choose the VPC created earlier and name it Public Subnet to 
+identify it from the other subnets created later on. 
+2.2.2 Choose any Availability Zone and it should have an IPv4 
+CIDR 192.168.1.0/24. Leave the tags to default or create new if 
+you want and then click Create Subnet.
+## Create Private Subnet 1, 2, 3
+2.3.1 Go to Step 2.1 and then choose the same VPC created earlier,
+follow the same process in creating a Public Subnet but rename it 
+to Private Subnet 1, Private Subnet 2, Private Subnet 3. 
+2.3.2 Private Subnet 1, Private Subnet 2 should be in the same 
+Availability Zone as the first subnet (Public Subnet). IPv4 
+Subnet should be 192.168.2.0/24 and 192.168.3.0/24, respectively.
+2.3.3 Private Subnet 3 should have a different Availabilit Zone 
+and IPv4 Subnet must be 192.168.4.0. 
+
+
+# Step 3: Route Tables 
+3.1 On the menu located on the left side, click Route Tables and then 
+click Create Route Tables.
+3.2 Create a Route Table named public-RT with the VPC created 
+earlier. This route table will serve as the public table for this 
+lab.
+3.3 Create a Route Table named private-RT with the VPC created 
+earlier. This route table will serve as the private table for this 
+lab.
+
+
+# Step 4: Associate Subnets to Route Tables
+4.1 On the menu located on the left side, click Route Tables and 
+choose public-RT and click on "Subnet associations" tab and then 
+click "Edit subnet associations".
+4.2 Choose Public Subnet as a subnet to be associated with the 
+public-RT route table and Save Associations.
+4.3 Repeat step 4.1 but this time, choose private-RT.
+4.4 Choose Private Subnet 1, Private Subnet 2, Private Subnet 3 as
+subnets to be associated with the private-RT and click Save 
+Associations.
+## Edit Routes for the Route Tables
+4.5.1 Skip this part for now.
+``` 
+NOTE: You can only add routes for the Route Tables after you 
+create the Internet Gateway and the NAT Gateway.
+```
+
+
+# Step 5: Create an Internet Gateway and NAT Gateway
+5.1 On the menu located on the left side, click Internet 
+Gateways and then Create internet gateway.
+5.2 Name it as lab-IGW and then click Create internet gateway.
+5.3 After creating the lab-IGW, attach it to VPC by clicking the
+Actions dropdown and choose "Attach to VPC" option.
+5.4 Choose the VPC created earlier in this lab and attach inernet
+gateway.
+5.5 On the menu located on the left side, click NAT Gateway and 
+then "Create NAT gateway".
+5.6 Give it a name in anyway you want but for this lab, NAT 
+gateway will be named as lab-NGW. The Subnet for this NAT gateway
+must be in the "Public Subnet" that was created earlier. The 
+connectivity must be set to "Public" and "Allocate Elastic IP" 
+for the NAT gateway. 
+
+
+# Step 6: Editing Routes for the Route Tables
+6.1 On the menu located on the left side, click Route tables, 
+choose public-RT and in the "Routes" tab, Click "Edit routes".
+6.2 Add "0.0.0.0" (aka anywhere) route as destination and the 
+Target value must be the "Internet Gateway" created earlier 
+(lab-IGW). After editing the route, click "Save changes".
+6.3 Repeat step 6.1 but choose private-RT.
+6.4 Add "0.0.0.0" (aka anywhere) route as destination and the 
+Target value must be the "NAT Gateway" created earlier 
+(lab-NGW). After editing the route, click "Save changes".
+
+
+# Step 7: Creating Security Groups
+-- Create Security Group for the Bastion Host, Web Server, App 
+Server, Database
+7.1 On the menu located on the left side, select Security groups
+and "Create security group".
+7.2 Name the security group to identify which of them is for the 
+bastion host, web, app, and database. In this case, We created 
+the security group for the bastion host first and named it 
+"BastionHostSG". Give a brief desscription for the security group
+and then choose the VPC created for this lab. The inbound rules 
+must allow HTTP(port 80), HTTPS(port 443), SSH(port 22) to 
+connect and the source must be from "0.0.0.0" (anywhere) and 
+then click "Create security group".
+7.3 Repeat steps 7.1 and 7.2 but modify the name to "WebServerSG".
+Select the same VPC and give the same inbound rules as the 
+"BastionHostSG". 
+7.4 Repeat steps 7.1 and 7.2 for the app server security group 
+but rename it to "AppServerSG". The inbound rules must have 
+"All ICMP - IPv4" with the "WebServerSG" as its source and 
+"SSH" must have the "BastionHostSG" as its source.
+7.5 Repeat steps 7.1 and 7.2 for the database security group 
+but rename it to "DatabaseSG". Set the inbound rules for 
+"MYSQL/Aurora" to have the "AppServerSG" as its source and 
+"MYSQL/Aurora" to have the "BastionHostSG" as its source and 
+then "Create security group".
+
+
+# Step 8: Modify Inbound Rules 
+8.1 Go back to the "Security groups" located on the menu on the 
+left side and then choose "BastionHostSG". Select " Inbound rules" 
+and click "Edit inbound rules".
+8.2 Add new inbound rule where the type is "MYSQL/Aurora" and 
+the Source is the "DatabaseSG" security group.
+8.3 Repeat 8.1 but choose "WebServerSG" to modify its inbound 
+rules. Add new inbound rule where the type is "All ICMP - IPv4" 
+and the Source is "AppServerSG" security group. Save rules.
+8.4 Repeat step 8.1. Choose "AppServerSG" to modify its inbound 
+rules. Add new rule for type "MYSQL/Aurora". The source is 
+"DatabaseSG". Add "HTTP" and "HTTPS" with source type "0.0.0.0"
+(anywhere).
+
+
+
+```
+in youtube video:
+jumpserverSG
+SSH only open 
+
+phpserversg
+SSH and source is jumpserverSG
+
+webserverSG
+
+```
+

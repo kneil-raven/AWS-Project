@@ -1,0 +1,40 @@
+# Step 1: SSH to Bastion Host
+1.1 SSH into the "Bastion Host" after downloading the .pem and 
+.ppk files from the lab environment.
+1.2 To transfer files securely between computers using SSH 
+protocol, open your CLI (Windows Powershell in this case) and 
+type the following command:
+```
+pscp -scp -P 22 -i "D:\Downloads\labsuser.ppk" -l user ec2-user "D:\Downloads\labsuser.pem" ec2-user@54.244.192.36:/home/ec2-user
+
+
+bastion host public IP: 54.244.192.36
+```
+1.3 Test in your SSH to see if the file is uploaded using `ls`
+command. It should be able to display "labsuser.pem" file.
+
+# Change file permissions
+1.4 Change file permissions for the "labsuser.pem" file using
+the command `chmod 400 labsuser.pem`.
+
+# SSH to App server
+1.5 SSH to "App Server" by typing
+```
+ssh -i my-key-pair.pem ec2-user@app-private-ip
+
+NOTE:
+Replace my-key-pair.pem with the name of your key
+Replace app-private-ip with your app server's private IP address
+```
+
+# Ping Private IP Address
+1.6 Use `ping` and find the private IP address of the "Web 
+Server" created to test connection.
+
+
+```
+bastion host public IP: 54.244.192.36
+app server private IP: 192.168.1.114
+web server private IP: 192.168.1.106
+endpoint: dbinstance.cj8syuiuojal.us-west-2.rds.amazonaws.com
+```
